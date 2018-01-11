@@ -47,6 +47,7 @@ class UserReadService
         // Since we did not get an exception, we can move on.
         $this->session->regenerateId();
         $segment = $this->session->getSegment('Masterclass');
+        $segment->set('user_id', $user->id);
         $segment->set('username', $user->username);
         $segment->set('AUTHENTICATED', true);
         return $user;

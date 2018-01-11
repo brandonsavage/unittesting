@@ -9,6 +9,7 @@ use Masterclass\Model\Comment as CommentModel;
 use Masterclass\Model\Stories\StoryReadService;
 use Masterclass\Model\Stories\StoryWriteService;
 use Masterclass\Model\Story as StoryModel;
+use Masterclass\Model\Likes\LikeGateway as LikeModel;
 use Masterclass\ModelLocator;
 use Masterclass\Request;
 use PDO;
@@ -20,6 +21,7 @@ class Story {
         StoryReadService $storyModel,
         StoryWriteService $storyWriteService,
         CommentModel $commentModel,
+        LikeModel $likeModel,
         ServerRequest $request,
         Session $session,
         View $view
@@ -27,6 +29,7 @@ class Story {
         $this->request = $request;
         $this->storyModel = $storyModel;
         $this->commentModel = $commentModel;
+        $this->likeModel = $likeModel;
         $this->session = $session;
         $this->view = $view;
         $this->storyWriteService = $storyWriteService;
@@ -61,7 +64,8 @@ class Story {
             'story' => $story,
             'comments' => $comments,
             'comment_count' => $comment_count,
-            'authenticated' => $segment->get('AUTHENTICATED', false)
+            'authenticated' => $segment->get('AUTHENTICATED', false),
+            'likes' => $this->likeModel->getLikesForStory($story->id),
         ];
 
         $this->view->setData($data);
@@ -98,21 +102,22 @@ class Story {
                 header("Location: /story?id=$story->id");
                 exit;
             }
-        }
 
-        $reason = $payload->getStatus();
-        $messages = $payload->getOutput();
 
-        if ($reason == PayloadStatus::NOT_VALID) {
-            // Yes, we are intentionally nesting foreach loops. This will always be
-            // a small dataset.
-            foreach ($messages as $message) {
-                foreach ($message as $messageSpecific) {
-                    $error .= $messageSpecific . '<br />';
+            $reason = $payload->getStatus();
+            $messages = $payload->getOutput();
+
+            if ($reason == PayloadStatus::NOT_VALID) {
+                // Yes, we are intentionally nesting foreach loops. This will always be
+                // a small dataset.
+                foreach ($messages as $message) {
+                    foreach ($message as $messageSpecific) {
+                        $error .= $messageSpecific . '<br />';
+                    }
                 }
+            } else if ($reason == PayloadStatus::ERROR) {
+                $error = $messages->getMessage();
             }
-        } else if ($reason == PayloadStatus::ERROR) {
-            $error = $messages->getMessage();
         }
 
         $this->view->setData(['errors' => $error]);

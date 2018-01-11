@@ -4,9 +4,24 @@ $story = $this->story;
 
 $content = '
 <a class="headline" href="' . $story->url . '">' . $story->headline . '</a><br />
-<span class="details">' . $story->created_by . ' | ' . $this->comment_count . ' Comments |
-            ' . date('n/j/Y g:i a', strtotime($story->created_on)) . '</span>
+<span class="details">' . $story->created_by . ' | ' . $this->comment_count . ' Comments |';
+
+if ($this->authenticated) {
+    $content .= '<a href = "/story/like?story=' . $story->id . '" > Like</a > | ';
+}
+
+$content .= ' ' . date('n/j/Y g:i a', strtotime($story->created_on)) . '</span>
 ';
+
+$content .= '<strong>Users who liked this:</strong><br />';
+
+$content .= '<ul>';
+
+foreach ($this->likes as $like) {
+    $content .= '<li>' . $like->username . '</li>';
+}
+
+$content .= '</ul>';
 
 if($this->authenticated) {
     $content .= '

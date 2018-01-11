@@ -1,6 +1,7 @@
 {
     "require-dev": {
-        "laravel/homestead": "^5"
+        "laravel/homestead": "^5",
+        "phpunit/phpunit": "5.7.*"
     },
 
     "autoload": {
@@ -15,6 +16,7 @@
         "modus/forms": "^2.0",
         "aura/accept": "^2.2",
         "aura/web": "^2.1",
-        "aura/payload": "^3.0"
+        "aura/payload": "^3.0",
+        "mockery/mockery": "^1.0"
     }
 }

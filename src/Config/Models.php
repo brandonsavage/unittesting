@@ -12,6 +12,8 @@ namespace Masterclass\Config;
 use Aura\Di\Config;
 use Aura\Di\Container;
 use Aura\Payload\PayloadFactory;
+use Masterclass\Model\Likes\LikeGateway;
+use Masterclass\Model\Likes\LikeStorage;
 use Masterclass\Model\Stories\StoryGateway;
 use Masterclass\Model\Stories\StoryReadService;
 use Masterclass\Model\Stories\StoryWriteService;
@@ -54,6 +56,14 @@ class Models extends Config
         ];
 
         $di->params[\Masterclass\Model\Users\UserStorage::class] = [
+            'dbal' => $di->lazyGet('Dbal.Database'),
+        ];
+
+        $di->params[LikeGateway::class] = [
+            'storage' => $di->lazyNew(LikeStorage::class),
+        ];
+
+        $di->params[LikeStorage::class] = [
             'dbal' => $di->lazyGet('Dbal.Database'),
         ];
 
